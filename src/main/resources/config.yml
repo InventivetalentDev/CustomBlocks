@@ -1,0 +1,8 @@
+# Imgur API Key. You can get your own key here: https://api.imgur.com/oauth2/addclient
+imgurClientId: "79dcf55ad247e02"
+
+# Forces the proper visibility for full blocks. (Will replace the block below with a transparent block)
+forceVisibility: false
+
+
+debug: false
