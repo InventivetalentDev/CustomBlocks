@@ -48,6 +48,7 @@ import org.inventivetalent.pluginannotations.command.Permission;
 import org.inventivetalent.pluginannotations.config.ConfigValue;
 import org.inventivetalent.skullclient.SkullCallback;
 import org.inventivetalent.skullclient.SkullData;
+import org.mcstats.MetricsLite;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -88,6 +89,14 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 
 		blockManager = new BlockManager(this);
 		new PacketListener(this);
+
+		try {
+			MetricsLite metrics = new MetricsLite(this);
+			if (metrics.start()) {
+				getLogger().info("Metrics started");
+			}
+		} catch (Exception e) {
+		}
 	}
 
 	@Command(name = "createcustomblock",
@@ -252,7 +261,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 								flags.remove(0);// This feels so cheaty...
 								flags.remove(0);
 
-								if(!flags.contains("skull")) {
+								if (!flags.contains("skull")) {
 									e.setCancelled(true);
 									int size = flags.contains("fullblock") ? 2 : flags.contains("bigblock") ? 1 : 0;
 									customBlock.spawnOnClicked(e.getClickedBlock(), e.getBlockFace(), flags.contains("solid"), size);
