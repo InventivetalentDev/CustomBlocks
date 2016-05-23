@@ -188,7 +188,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 					 "cbg",
 					 "gcb"
 			 },
-			 usage = "<Name> [Flags (solid, smallBlock, bigBlock, fullBlock)]",
+			 usage = "<Name> [Flags (solid, smallBlock, bigBlock, fullBlock, skull)]",
 			 description = "Get a custom block",
 			 min = 1,
 			 max = -1,
@@ -240,7 +240,6 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 							String displayName = hand.getItemMeta().getDisplayName();
 							if ("§6CustomBlock".equals(displayName)) {
 								if (hand.getItemMeta().getLore().size() < 2) { return; }
-								e.setCancelled(true);
 								String name = hand.getItemMeta().getLore().get(0);
 								if (!blockManager.doesBlockExist(name)) {
 									e.getPlayer().sendMessage("§cBlock file doesn't exist");
@@ -253,8 +252,12 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 								flags.remove(0);// This feels so cheaty...
 								flags.remove(0);
 
-								int size = flags.contains("fullblock") ? 2 : flags.contains("bigblock") ? 1 : 0;
-								customBlock.spawnOnClicked(e.getClickedBlock(), e.getBlockFace(), flags.contains("solid"), size);
+								if(!flags.contains("skull")) {
+									e.setCancelled(true);
+									int size = flags.contains("fullblock") ? 2 : flags.contains("bigblock") ? 1 : 0;
+									customBlock.spawnOnClicked(e.getClickedBlock(), e.getBlockFace(), flags.contains("solid"), size);
+								}
+								// if it contains "skull", just let the player place the default skull item
 							}
 						}
 					}
