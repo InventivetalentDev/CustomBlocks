@@ -138,7 +138,7 @@ public enum Position {
 	 * @return new image
 	 */
 	public BufferedImage drawImage(BufferedImage original) {
-		BufferedImage newImage = new BufferedImage(64, 32, original.getType());
+		BufferedImage newImage = new BufferedImage(64, 32, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D graphics = newImage.createGraphics();
 		for (int i = 0; i < sides.length; i++) {
 			BufferedImage sideSub = sides[i].subImage(original);
