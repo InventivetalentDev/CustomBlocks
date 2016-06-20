@@ -99,7 +99,10 @@ public class PacketListener extends PacketHandler {
 					}
 				}
 
-				if (action != 1) { return; }
+				if (action != 1) {
+					packet.setCancelled(true);// Interact
+					return;
+				}
 
 				final Entity ent2 = ent;
 
