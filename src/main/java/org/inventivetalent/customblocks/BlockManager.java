@@ -181,8 +181,6 @@ public class BlockManager {
 										if (plugin.debug) {
 											plugin.getLogger().info("Generated skull " + finalX + "," + finalY + "," + finalZ);
 										}
-										System.out.println(skin.id);
-										System.out.println(skin.nextRequest										);
 									}
 
 									@Override
