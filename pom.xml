@@ -152,7 +152,7 @@
         <dependency>
             <groupId>org.inventivetalent.packetlistener</groupId>
             <artifactId>api</artifactId>
-            <version>[3.4.0,)</version>
+            <version>[3.5.0,)</version>
         </dependency>
 
         <dependency>
