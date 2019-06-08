@@ -158,9 +158,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.inventivetalent</groupId>
-            <artifactId>skullclient</artifactId>
-            <version>1.1.0</version>
+            <groupId>org.mineskin</groupId>
+            <artifactId>java-client</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent</groupId>
