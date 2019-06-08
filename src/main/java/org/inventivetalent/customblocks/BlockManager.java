@@ -34,9 +34,10 @@ import org.inventivetalent.customblocks.data.CoordinateImageData;
 import org.inventivetalent.customblocks.data.ImageData;
 import org.inventivetalent.imgur.ImgurUploader;
 import org.inventivetalent.imgur.UploadCallback;
-import org.inventivetalent.skullclient.SkullCallback;
-import org.inventivetalent.skullclient.SkullClient;
-import org.inventivetalent.skullclient.SkullData;
+import org.mineskin.MineskinClient;
+import org.mineskin.data.Skin;
+import org.mineskin.data.SkinCallback;
+import org.mineskin.data.SkinData;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -60,17 +61,20 @@ public class BlockManager {
 
 	private CustomBlocks plugin;
 
+	private MineskinClient skinClient ;
+
 	private Executor createExecutor = Executors.newSingleThreadExecutor();
 
 	public BlockManager(CustomBlocks plugin) {
 		this.plugin = plugin;
+		skinClient = new MineskinClient();
 	}
 
-	public void createBlock(final String name, final String image, final ImageDownloadCallback imageDownloadCallback, final UploadCallback uploadCallback, final SkullCallback skullCallback, final BlockCallback blockCallback) throws MalformedURLException {
+	public void createBlock(final String name, final String image, final ImageDownloadCallback imageDownloadCallback, final UploadCallback uploadCallback, final SkinCallback skinCallback, final BlockCallback blockCallback) throws MalformedURLException {
 		checkNotNull(name);
 		checkNotNull(image);
 		checkNotNull(uploadCallback);
-		checkNotNull(skullCallback);
+		checkNotNull(skinCallback);
 
 		final URL imageUrl = new URL(image);
 
@@ -157,8 +161,8 @@ public class BlockManager {
 				uploadCallback.uploaded(null, null);
 
 				//Convert the images to skin data
-				final SkullData[] originalData = new SkullData[1];
-				final SkullData[][][] data = new SkullData[2][2][2];
+				final SkinData[] originalData = new SkinData[1];
+				final SkinData[][][] data = new SkinData[2][2][2];
 				try {
 					final CountDownLatch skullLatch = new CountDownLatch(9/* converted + original */);
 					final boolean[] skullFailed = new boolean[1];
@@ -168,13 +172,25 @@ public class BlockManager {
 								final int finalX = x;
 								final int finalY = y;
 								final int finalZ = z;
-								SkullClient.create(urls[x][y][z], new SkullCallback() {
+								skinClient.generateUrl(urls[x][y][z], new SkinCallback() {
+									@Override
+									public void done(Skin skin) {
+										data[finalX][finalY][finalZ] = skin.data;
+										skullLatch.countDown();
+
+										if (plugin.debug) {
+											plugin.getLogger().info("Generated skull " + finalX + "," + finalY + "," + finalZ);
+										}
+										System.out.println(skin.id);
+										System.out.println(skin.nextRequest										);
+									}
+
 									@Override
 									public void waiting(long l) {
 										if (plugin.debug) {
 											plugin.getLogger().info("[waiting] " + finalX + "," + finalY + "," + finalZ + ": " + l);
 										}
-										skullCallback.waiting(l);
+										skinCallback.waiting(l);
 									}
 
 									@Override
@@ -182,71 +198,62 @@ public class BlockManager {
 										if (plugin.debug) {
 											plugin.getLogger().info("[uploading] " + finalX + "," + finalY + "," + finalZ);
 										}
-										skullCallback.uploading();
+										skinCallback.uploading();
 									}
 
 									@Override
 									public void error(String s) {
 										skullFailed[0] = true;
-										skullCallback.error(s);
+										skinCallback.error(s);
 										skullLatch.countDown();
 									}
 
-									@Override
-									public void done(SkullData skullData) {
-										data[finalX][finalY][finalZ] = skullData;
-										skullLatch.countDown();
-
-										if (plugin.debug) {
-											plugin.getLogger().info("Generated skull " + finalX + "," + finalY + "," + finalZ);
-										}
-									}
 								});
 							}
 						}
 					}
-					SkullClient.create(originalUrl[0], new SkullCallback() {
+					skinClient.generateUrl(originalUrl[0], new SkinCallback() {
 						@Override
 						public void waiting(long l) {
-							skullCallback.waiting(l);
+							skinCallback.waiting(l);
 						}
 
 						@Override
 						public void uploading() {
-							skullCallback.uploading();
+							skinCallback.uploading();
 						}
 
 						@Override
 						public void error(String s) {
 							skullFailed[0] = true;
-							skullCallback.error(s);
+							skinCallback.error(s);
 							skullLatch.countDown();
 						}
 
 						@Override
-						public void done(SkullData skullData) {
-							originalData[0] = skullData;
+						public void done(Skin skin) {
+							originalData[0] = skin.data;
 							skullLatch.countDown();
 						}
 					});
 					skullLatch.await(SKULL_TIMEOUT, TimeUnit.MILLISECONDS);
 					if (skullFailed[0]) {
-						skullCallback.error("failed");
+						skinCallback.error("failed");
 						return;
 					}
 				} catch (Exception e) {
-					skullCallback.error(e.getMessage());
+					skinCallback.error(e.getMessage());
 					throw new RuntimeException(e);
 				}
-				skullCallback.done(null);
+				skinCallback.done(null);
 
-				ImageData baseData = ImageData.fromProperty(originalUrl[0], originalData[0].getProperties().firstTexture());
+				ImageData baseData = ImageData.fromProperty(originalUrl[0], originalData[0].texture);
 				Set<CoordinateImageData> imageDatas = new HashSet<>();
 				for (int x = 0; x < 2; x++) {
 					for (int y = 0; y < 2; y++) {
 						for (int z = 0; z < 2; z++) {
-							SkullData skullData = data[x][y][z];
-							imageDatas.add(CoordinateImageData.from(ImageData.fromProperty(urls[x][y][z], skullData.getProperties().firstTexture()), x, y, z));
+							SkinData skullData = data[x][y][z];
+							imageDatas.add(CoordinateImageData.from(ImageData.fromProperty(urls[x][y][z], skullData.texture), x, y, z));
 						}
 					}
 				}

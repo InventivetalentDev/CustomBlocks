@@ -35,7 +35,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.inventivetalent.customblocks.HeadTextureChanger;
 import org.inventivetalent.mcwrapper.auth.GameProfileWrapper;
 import org.inventivetalent.mcwrapper.auth.properties.PropertyWrapper;
-import org.inventivetalent.skullclient.SkullProperty;
+import org.mineskin.data.Texture;
 
 import java.util.*;
 
@@ -76,8 +76,8 @@ public class ImageData {
 		return itemStack;
 	}
 
-	public static ImageData fromProperty(String image, SkullProperty property) {
-		return new ImageData(image, property.getValue(), property.getSignature());
+	public static ImageData fromProperty(String image, Texture texture) {
+		return new ImageData(image, texture.value, texture.signature);
 	}
 
 }

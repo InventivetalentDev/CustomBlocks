@@ -78,19 +78,20 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>org.mcstats.*</include>
+                                    <include>org.bstats**</include>
                                     <include>org.inventivetalent:customblocks**</include>
                                     <include>org.inventivetalent:reflectionhelper**</include>
                                     <include>org.inventivetalent:pluginannotations**</include>
-                                    <include>org.inventivetalent:skullclient**</include>
+                                    <include>org.mineskin:java-client**</include>
                                     <include>org.inventivetalent:imgur-uploader**</include>
                                     <include>org.inventivetalent:mc-wrappers**</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.mcstats</pattern>
-                                    <shadedPattern>org.inventivetalent.customblocks.mcstats</shadedPattern>
+                                    <pattern>org.bstats</pattern>
+                                    <!-- Replace this with your package! -->
+                                    <shadedPattern>org.inventivetalent.customblocks.stats</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -114,51 +115,53 @@
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.9-R0.1-SNAPSHOT</version>
+            <artifactId>spigot-api</artifactId>
+            <version>1.12-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.9-R0.1-SNAPSHOT</version>
+            <artifactId>bukkit</artifactId>
+            <version>1.12-R0.1-SNAPSHOT</version>
         </dependency>
+
         <dependency>
-            <groupId>org.mcstats.bukkit</groupId>
-            <artifactId>metrics-lite</artifactId>
-            <version>R8-SNAPSHOT</version>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.inventivetalent.spiget-update</groupId>
             <artifactId>bukkit</artifactId>
-            <version>[1.0.1,)</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent</groupId>
             <artifactId>reflectionhelper</artifactId>
-            <version>[1.10.3,)</version>
+            <version>1.14.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent</groupId>
             <artifactId>pluginannotations</artifactId>
-            <version>[1.4.2,)</version>
+            <version>1.4.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent</groupId>
             <artifactId>mc-wrappers</artifactId>
-            <version>[1.0.1,)</version>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent.packetlistener</groupId>
             <artifactId>api</artifactId>
-            <version>[3.4.0,)</version>
+            <version>3.7.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.inventivetalent</groupId>
-            <artifactId>skullclient</artifactId>
-            <version>1.1.0</version>
+            <groupId>org.mineskin</groupId>
+            <artifactId>java-client</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent</groupId>
@@ -205,12 +208,8 @@
             <url>http://maven.sk89q.com/artifactory/repo/</url>
         </repository>
         <repository>
-            <id>techcable-repo</id>
-            <url>http://repo.techcable.net/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>mcstats-repo</id>
-            <url>http://repo.mcstats.org/content/groups/public/</url>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
     </repositories>
 </project>

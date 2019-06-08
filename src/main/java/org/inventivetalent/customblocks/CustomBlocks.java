@@ -29,6 +29,7 @@
 package org.inventivetalent.customblocks;
 
 import com.google.gson.JsonElement;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -46,9 +47,8 @@ import org.inventivetalent.pluginannotations.command.Completion;
 import org.inventivetalent.pluginannotations.command.JoinedArg;
 import org.inventivetalent.pluginannotations.command.Permission;
 import org.inventivetalent.pluginannotations.config.ConfigValue;
-import org.inventivetalent.skullclient.SkullCallback;
-import org.inventivetalent.skullclient.SkullData;
-import org.mcstats.MetricsLite;
+import org.mineskin.data.Skin;
+import org.mineskin.data.SkinCallback;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -90,13 +90,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 		blockManager = new BlockManager(this);
 		new PacketListener(this);
 
-		try {
-			MetricsLite metrics = new MetricsLite(this);
-			if (metrics.start()) {
-				getLogger().info("Metrics started");
-			}
-		} catch (Exception e) {
-		}
+		new Metrics(this);
 	}
 
 	@Command(name = "createcustomblock",
@@ -147,7 +141,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 					sender.sendMessage(" ");
 					sender.sendMessage("§7Generating skull data (This may take up to 5 minutes)...");
 				}
-			}, new SkullCallback() {
+			}, new SkinCallback() {
 				int generateCounter = 1;
 
 				@Override
@@ -167,7 +161,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 				}
 
 				@Override
-				public void done(SkullData skullData) {
+				public void done(Skin skullData) {
 					sender.sendMessage("§eSkull data generated. §7Finishing block...");
 					sender.sendMessage(" ");
 				}
