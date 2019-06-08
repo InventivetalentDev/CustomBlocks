@@ -137,7 +137,7 @@
         <dependency>
             <groupId>org.inventivetalent</groupId>
             <artifactId>reflectionhelper</artifactId>
-            <version>[1.10.3,)</version>
+            <version>[1.10.4,)</version>
         </dependency>
         <dependency>
             <groupId>org.inventivetalent</groupId>
