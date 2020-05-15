@@ -170,11 +170,19 @@ public class BlockManager {
 						@Override
 						public void waiting(long l) {
 							skinCallback.waiting(l);
+
+							if (plugin.debug) {
+								plugin.getLogger().info("[waiting] base: " + l);
+							}
 						}
 
 						@Override
 						public void uploading() {
 							skinCallback.uploading();
+
+							if (plugin.debug) {
+								plugin.getLogger().info("[uploading] base");
+							}
 						}
 
 						@Override
@@ -188,6 +196,10 @@ public class BlockManager {
 						public void done(Skin skin) {
 							originalData[0] = skin.data;
 							skullLatch.countDown();
+
+							if (plugin.debug) {
+								plugin.getLogger().info("Generated base skull");
+							}
 						}
 					});
 					if (skullFailed[0]) {
