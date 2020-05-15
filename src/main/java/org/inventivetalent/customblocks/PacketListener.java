@@ -102,30 +102,35 @@ public class PacketListener extends PacketHandler {
 				final Entity ent2 = ent;
 
 				final String baseName = ent.getCustomName();
-				for (final Entity ent1 : p.getNearbyEntities(16, 16, 16)) {
-					Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
-
-						@Override
-						public void run() {
-							if (ent1 == null) { return; }
-							if (ent1 instanceof ArmorStand) {
-								if (ent1.getCustomName() != null && ent1.getCustomName().equals(baseName)) {
-									if (ent1.getLocation().getBlockX() == ent2.getLocation().getBlockX() && ent1.getLocation().getBlockZ() == ent2.getLocation().getBlockZ() && (ent1.getLocation().getBlockY() == ent2.getLocation().getBlockY() || ent1.getLocation().getBlockY() + 1 == ent2.getLocation().getBlockY())) {
-										ent1.remove();
-									}
-								}
-							}
-						}
-					});
-				}
-
-				Bukkit.getScheduler().scheduleSyncDelayedTask(this.getPlugin(), new Runnable() {
-
+				Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
 					@Override
 					public void run() {
-						block.breakNaturally(new ItemStack(Material.AIR));
-						block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 159);
-						block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 42);
+						for (final Entity ent1 : p.getNearbyEntities(16, 16, 16)) {
+							Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+
+								@Override
+								public void run() {
+									if (ent1 == null) { return; }
+									if (ent1 instanceof ArmorStand) {
+										if (ent1.getCustomName() != null && ent1.getCustomName().equals(baseName)) {
+											if (ent1.getLocation().getBlockX() == ent2.getLocation().getBlockX() && ent1.getLocation().getBlockZ() == ent2.getLocation().getBlockZ() && (ent1.getLocation().getBlockY() == ent2.getLocation().getBlockY() || ent1.getLocation().getBlockY() + 1 == ent2.getLocation().getBlockY())) {
+												ent1.remove();
+											}
+										}
+									}
+								}
+							});
+						}
+
+						Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+
+							@Override
+							public void run() {
+								block.breakNaturally(new ItemStack(Material.AIR));
+								block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 159);
+								block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 42);
+							}
+						});
 					}
 				});
 			}
