@@ -2,5 +2,6 @@ name: CustomBlocks
 main: org.inventivetalent.customblocks.CustomBlocks
 author: inventivetalent
 version: ${project.version}
+api-version: '1.13'
 
 softdepend: [PacketListenerApi]

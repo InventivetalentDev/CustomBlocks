@@ -90,7 +90,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 		blockManager = new BlockManager(this);
 		new PacketListener(this);
 
-		new Metrics(this);
+		new Metrics(this, 7542);
 	}
 
 	@Command(name = "createcustomblock",
@@ -237,7 +237,7 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 			if (e.getAction() != Action.RIGHT_CLICK_BLOCK) { return; }
 			if (e.getClickedBlock().getType() != Material.AIR) {
 				ItemStack hand = e.getPlayer().getItemInHand();
-				if (hand != null && (hand.getType() == Material.SKULL_ITEM || hand.getType() == Material.SKULL)) {
+				if (hand != null && (hand.getType() == Material.PLAYER_HEAD || hand.getType() == Material.PLAYER_WALL_HEAD)) {
 					if (hand.hasItemMeta()) {
 						if (e.getPlayer().hasPermission("customblocks.place")) {
 							String displayName = hand.getItemMeta().getDisplayName();

@@ -61,7 +61,7 @@ public class ImageData {
 	}
 
 	public ItemStack toItem(String displayName, String blockName, Collection<String> extraLore) {
-		ItemStack itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+		ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD, 1);
 		SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
 		meta.setDisplayName(displayName);
 		List<String> lore = new ArrayList<>(Arrays.asList(blockName, getImage()));
