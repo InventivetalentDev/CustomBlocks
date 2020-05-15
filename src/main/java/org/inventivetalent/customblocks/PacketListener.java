@@ -35,7 +35,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.inventivetalent.packetlistener.handler.PacketHandler;
@@ -90,13 +89,9 @@ public class PacketListener extends PacketHandler {
 
 				final Block block = ent.getLocation().add(0, 1, 0).getBlock();
 
-				BlockBreakEvent event = new BlockBreakEvent(block, p);
-				Bukkit.getPluginManager().callEvent(event);
-				if (event.isCancelled()) {
-					if (!p.hasPermission("customblocks.break")) {
-						packet.setCancelled(true);
-						return;
-					}
+				if (!p.hasPermission("customblocks.break")) {
+					packet.setCancelled(true);
+					return;
 				}
 
 				if (action != 1) {
