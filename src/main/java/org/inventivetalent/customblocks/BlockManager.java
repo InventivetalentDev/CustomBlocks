@@ -166,6 +166,34 @@ public class BlockManager {
 				try {
 					final CountDownLatch skullLatch = new CountDownLatch(9/* converted + original */);
 					final boolean[] skullFailed = new boolean[1];
+					skinClient.generateUrl(originalUrl[0], new SkinCallback() {
+						@Override
+						public void waiting(long l) {
+							skinCallback.waiting(l);
+						}
+
+						@Override
+						public void uploading() {
+							skinCallback.uploading();
+						}
+
+						@Override
+						public void error(String s) {
+							skullFailed[0] = true;
+							skinCallback.error(s);
+							skullLatch.countDown();
+						}
+
+						@Override
+						public void done(Skin skin) {
+							originalData[0] = skin.data;
+							skullLatch.countDown();
+						}
+					});
+					if (skullFailed[0]) {
+						skinCallback.error("failed");
+						return;
+					}
 					for (int x = 0; x < 2; x++) {
 						for (int y = 0; y < 2; y++) {
 							for (int z = 0; z < 2; z++) {
@@ -210,30 +238,6 @@ public class BlockManager {
 							}
 						}
 					}
-					skinClient.generateUrl(originalUrl[0], new SkinCallback() {
-						@Override
-						public void waiting(long l) {
-							skinCallback.waiting(l);
-						}
-
-						@Override
-						public void uploading() {
-							skinCallback.uploading();
-						}
-
-						@Override
-						public void error(String s) {
-							skullFailed[0] = true;
-							skinCallback.error(s);
-							skullLatch.countDown();
-						}
-
-						@Override
-						public void done(Skin skin) {
-							originalData[0] = skin.data;
-							skullLatch.countDown();
-						}
-					});
 					skullLatch.await(SKULL_TIMEOUT, TimeUnit.MILLISECONDS);
 					if (skullFailed[0]) {
 						skinCallback.error("failed");
