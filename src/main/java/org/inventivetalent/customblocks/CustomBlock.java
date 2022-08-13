@@ -58,7 +58,7 @@ public class CustomBlock {
 
 	public CoordinateImageData getCoordinateData(int x, int y, int z) {
 		for (CoordinateImageData data : images) {
-			if (data.getX() == x && data.getY() == y && data.getZ() == z) { return data; }
+			if (data.getX() == x && data.getY() == y && data.getZ() == z) {return data;}
 		}
 		return null;
 	}

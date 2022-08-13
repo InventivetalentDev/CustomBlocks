@@ -57,11 +57,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BlockManager {
 
 	static final long UPLOAD_TIMEOUT = 30000;
-	static final long SKULL_TIMEOUT  = 30000 * 9;
+	static final long SKULL_TIMEOUT = 30000 * 9;
 
 	private CustomBlocks plugin;
 
-	private MineskinClient skinClient ;
+	private MineskinClient skinClient;
 
 	private Executor createExecutor = Executors.newSingleThreadExecutor();
 

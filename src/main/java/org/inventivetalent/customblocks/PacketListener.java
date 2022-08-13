@@ -44,97 +44,97 @@ import org.inventivetalent.packetlistener.handler.SentPacket;
 
 public class PacketListener extends PacketHandler {
 
-	protected static PacketListener instance;
+    protected static PacketListener instance;
 
-	public PacketListener(Plugin pl) {
-		super(pl);
-		if (instance != null) { throw new IllegalStateException("Cannot instantiate PacketListener twice"); }
-		instance = this;
-		addHandler(instance);
-	}
+    public PacketListener(Plugin pl) {
+        super(pl);
+        if (instance != null) {throw new IllegalStateException("Cannot instantiate PacketListener twice");}
+        instance = this;
+        addHandler(instance);
+    }
 
-	public static void disable() {
-		if (instance != null) {
-			removeHandler(instance);
-			instance = null;
-		}
-	}
+    public static void disable() {
+        if (instance != null) {
+            removeHandler(instance);
+            instance = null;
+        }
+    }
 
-	@Override
-	public void onSend(SentPacket packet) {
-	}
+    @Override
+    public void onSend(SentPacket packet) {
+    }
 
-	@Override
-	@PacketOptions(forcePlayer = true)
-	public void onReceive(ReceivedPacket packet) {
-		if (packet.hasPlayer()) {
-			if (packet.getPacketName().equals("PacketPlayInUseEntity")) {
-				int id = (int) packet.getPacketValue("a");
-				Object useAction = packet.getPacketValue("action");
+    @Override
+    @PacketOptions(forcePlayer = true)
+    public void onReceive(ReceivedPacket packet) {
+        if (packet.hasPlayer()) {
+            if (packet.getPacketName().equals("PacketPlayInUseEntity")) {
+                int id = (int) packet.getPacketValue("a");
+                Object useAction = packet.getPacketValue("action");
 
-				if (useAction == null) { return; }
+                if (useAction == null) {return;}
 
-				ArmorStand ent = null;
-				for (ArmorStand e : packet.getPlayer().getWorld().getEntitiesByClass(ArmorStand.class)) {
-					if (e.getEntityId() == id) {
-						ent = e;
-					}
-				}
-				if (ent == null) { return; }
-				if (ent.getCustomName() == null || !ent.getCustomName().startsWith("CustomBlock_#")) { return; }
+                ArmorStand ent = null;
+                for (ArmorStand e : packet.getPlayer().getWorld().getEntitiesByClass(ArmorStand.class)) {
+                    if (e.getEntityId() == id) {
+                        ent = e;
+                    }
+                }
+                if (ent == null) {return;}
+                if (ent.getCustomName() == null || !ent.getCustomName().startsWith("CustomBlock_#")) {return;}
 
-				Player p = packet.getPlayer();
+                Player p = packet.getPlayer();
 
-				int action = ((Enum) useAction).ordinal();
+                int action = ((Enum) useAction).ordinal();
 
-				final Block block = ent.getLocation().add(0, 1, 0).getBlock();
+                final Block block = ent.getLocation().add(0, 1, 0).getBlock();
 
-				if (!p.hasPermission("customblocks.break")) {
-					packet.setCancelled(true);
-					return;
-				}
+                if (!p.hasPermission("customblocks.break")) {
+                    packet.setCancelled(true);
+                    return;
+                }
 
-				if (action != 1) {
-					packet.setCancelled(true);// Interact
-					return;
-				}
+                if (action != 1) {
+                    packet.setCancelled(true);// Interact
+                    return;
+                }
 
-				final Entity ent2 = ent;
+                final Entity ent2 = ent;
 
-				final String baseName = ent.getCustomName();
-				Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
-					@Override
-					public void run() {
-						for (final Entity ent1 : p.getNearbyEntities(16, 16, 16)) {
-							Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+                final String baseName = ent.getCustomName();
+                Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
+                    @Override
+                    public void run() {
+                        for (final Entity ent1 : p.getNearbyEntities(16, 16, 16)) {
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
 
-								@Override
-								public void run() {
-									if (ent1 == null) { return; }
-									if (ent1 instanceof ArmorStand) {
-										if (ent1.getCustomName() != null && ent1.getCustomName().equals(baseName)) {
-											if (ent1.getLocation().getBlockX() == ent2.getLocation().getBlockX() && ent1.getLocation().getBlockZ() == ent2.getLocation().getBlockZ() && (ent1.getLocation().getBlockY() == ent2.getLocation().getBlockY() || ent1.getLocation().getBlockY() + 1 == ent2.getLocation().getBlockY())) {
-												ent1.remove();
-											}
-										}
-									}
-								}
-							});
-						}
+                                @Override
+                                public void run() {
+                                    if (ent1 == null) {return;}
+                                    if (ent1 instanceof ArmorStand) {
+                                        if (ent1.getCustomName() != null && ent1.getCustomName().equals(baseName)) {
+                                            if (ent1.getLocation().getBlockX() == ent2.getLocation().getBlockX() && ent1.getLocation().getBlockZ() == ent2.getLocation().getBlockZ() && (ent1.getLocation().getBlockY() == ent2.getLocation().getBlockY() || ent1.getLocation().getBlockY() + 1 == ent2.getLocation().getBlockY())) {
+                                                ent1.remove();
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
 
-						Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
 
-							@Override
-							public void run() {
-								block.breakNaturally(new ItemStack(Material.AIR));
-								block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 159);
-								block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 42);
-							}
-						});
-					}
-				});
-			}
-		}
-	}
+                            @Override
+                            public void run() {
+                                block.breakNaturally(new ItemStack(Material.AIR));
+                                block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 159);
+                                block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 42);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }
 
 }

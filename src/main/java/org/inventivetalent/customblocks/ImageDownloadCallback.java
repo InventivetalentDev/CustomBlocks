@@ -30,8 +30,8 @@ package org.inventivetalent.customblocks;
 
 public interface ImageDownloadCallback {
 
-	void exception(Throwable throwable);
+    void exception(Throwable throwable);
 
-	void done();
+    void done();
 
 }

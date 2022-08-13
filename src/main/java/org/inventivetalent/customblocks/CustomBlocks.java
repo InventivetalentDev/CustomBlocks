@@ -58,215 +58,218 @@ import java.util.logging.Level;
 
 public class CustomBlocks extends JavaPlugin implements Listener {
 
-	File savesFolder = new File(getDataFolder(), "saves");
+    File savesFolder = new File(getDataFolder(), "saves");
 
-	@ConfigValue(path = "imgurClientId") public          String  imgurClientId;
-	@ConfigValue(path = "forceVisibility") public static boolean forceVisibility;
+    @ConfigValue(path = "imgurClientId")
+    public String imgurClientId;
+    @ConfigValue(path = "forceVisibility")
+    public static boolean forceVisibility;
 
-	@ConfigValue(path = "debug") public boolean debug = false;
+    @ConfigValue(path = "debug")
+    public boolean debug = false;
 
-	BlockManager blockManager;
+    BlockManager blockManager;
 
-	@Override
-	public void onEnable() {
-		if (!Bukkit.getPluginManager().isPluginEnabled("PacketListenerApi")) {
-			getLogger().warning("****************************************");
-			getLogger().warning(" ");
-			getLogger().warning("    Please install PacketListenerApi    ");
-			getLogger().warning("       https://r.spiget.org/2930        ");
-			getLogger().warning(" ");
-			getLogger().warning("****************************************");
-			throw new RuntimeException("Missing PacketListenerApi");
-		}
+    @Override
+    public void onEnable() {
+        if (!Bukkit.getPluginManager().isPluginEnabled("PacketListenerApi")) {
+            getLogger().warning("****************************************");
+            getLogger().warning(" ");
+            getLogger().warning("    Please install PacketListenerApi    ");
+            getLogger().warning("       https://r.spiget.org/2930        ");
+            getLogger().warning(" ");
+            getLogger().warning("****************************************");
+            throw new RuntimeException("Missing PacketListenerApi");
+        }
 
-		saveDefaultConfig();
-		PluginAnnotations.loadAll(this, this);
-		Bukkit.getPluginManager().registerEvents(this, this);
+        saveDefaultConfig();
+        PluginAnnotations.loadAll(this, this);
+        Bukkit.getPluginManager().registerEvents(this, this);
 
-		if (!savesFolder.exists()) {
-			savesFolder.mkdirs();
-		}
+        if (!savesFolder.exists()) {
+            savesFolder.mkdirs();
+        }
 
-		blockManager = new BlockManager(this);
-		new PacketListener(this);
+        blockManager = new BlockManager(this);
+        new PacketListener(this);
 
-		new Metrics(this, 7542);
-	}
+        new Metrics(this, 7542);
+    }
 
-	@Command(name = "createcustomblock",
-			 aliases = {
-					 "createblock",
-					 "customblockcreate",
-					 "cbc",
-					 "ccb"
-			 },
-			 usage = "<Name> <URL>",
-			 description = "Create a custom block",
-			 min = 2,
-			 max = 2,
-			 fallbackPrefix = "customblocks")
-	@Permission("customblocks.create")
-	public void createBlock(final CommandSender sender, final String name, final String urlString) {
-		if (blockManager.doesBlockExist(name)) {
-			sender.sendMessage("§cBlock already exists");
-			return;
-		}
-		try {
-			final URL url = new URL(urlString);
+    @Command(name = "createcustomblock",
+            aliases = {
+                    "createblock",
+                    "customblockcreate",
+                    "cbc",
+                    "ccb"
+            },
+            usage = "<Name> <URL>",
+            description = "Create a custom block",
+            min = 2,
+            max = 2,
+            fallbackPrefix = "customblocks")
+    @Permission("customblocks.create")
+    public void createBlock(final CommandSender sender, final String name, final String urlString) {
+        if (blockManager.doesBlockExist(name)) {
+            sender.sendMessage("§cBlock already exists");
+            return;
+        }
+        try {
+            final URL url = new URL(urlString);
 
-			sender.sendMessage("§7Creating block...");
-			blockManager.createBlock(name, urlString, new ImageDownloadCallback() {
-				@Override
-				public void exception(Throwable throwable) {
-					sender.sendMessage("§cCould not download image: " + throwable.getMessage());
-					getLogger().log(Level.WARNING, "Could not download image", throwable);
-				}
+            sender.sendMessage("§7Creating block...");
+            blockManager.createBlock(name, urlString, new ImageDownloadCallback() {
+                @Override
+                public void exception(Throwable throwable) {
+                    sender.sendMessage("§cCould not download image: " + throwable.getMessage());
+                    getLogger().log(Level.WARNING, "Could not download image", throwable);
+                }
 
-				@Override
-				public void done() {
-					sender.sendMessage("§eOriginal image downloaded");
-					sender.sendMessage(" ");
-					sender.sendMessage("§7Generating images...");
-				}
-			}, new UploadCallback() {
-				@Override
-				public void exception(Throwable throwable) {
-					sender.sendMessage("§cCould not upload image: " + throwable.getMessage());
-					getLogger().log(Level.WARNING, "Could not upload image", throwable);
-				}
+                @Override
+                public void done() {
+                    sender.sendMessage("§eOriginal image downloaded");
+                    sender.sendMessage(" ");
+                    sender.sendMessage("§7Generating images...");
+                }
+            }, new UploadCallback() {
+                @Override
+                public void exception(Throwable throwable) {
+                    sender.sendMessage("§cCould not upload image: " + throwable.getMessage());
+                    getLogger().log(Level.WARNING, "Could not upload image", throwable);
+                }
 
-				@Override
-				public void uploaded(Map<String, String> map, JsonElement jsonElement) {
-					sender.sendMessage("§eImages generated & uploaded");
-					sender.sendMessage(" ");
-					sender.sendMessage("§7Generating skull data (This may take up to 5 minutes)...");
-				}
-			}, new SkinCallback() {
-				int generateCounter = 1;
+                @Override
+                public void uploaded(Map<String, String> map, JsonElement jsonElement) {
+                    sender.sendMessage("§eImages generated & uploaded");
+                    sender.sendMessage(" ");
+                    sender.sendMessage("§7Generating skull data (This may take up to 5 minutes)...");
+                }
+            }, new SkinCallback() {
+                int generateCounter = 1;
 
-				@Override
-				public void waiting(long l) {
-					sender.sendMessage("§8(Waiting " + (l / 1000D) + "s for next skull)");
-				}
+                @Override
+                public void waiting(long l) {
+                    sender.sendMessage("§8(Waiting " + (l / 1000D) + "s for next skull)");
+                }
 
-				@Override
-				public void uploading() {
-					sender.sendMessage("§7Generating skull (" + (generateCounter++) + "/9)...");
-				}
+                @Override
+                public void uploading() {
+                    sender.sendMessage("§7Generating skull (" + (generateCounter++) + "/9)...");
+                }
 
-				@Override
-				public void error(String s) {
-					sender.sendMessage("§cCould not generate skull data: " + s);
-					getLogger().log(Level.WARNING, "Could not generate skull data: " + s);
-				}
+                @Override
+                public void error(String s) {
+                    sender.sendMessage("§cCould not generate skull data: " + s);
+                    getLogger().log(Level.WARNING, "Could not generate skull data: " + s);
+                }
 
-				@Override
-				public void done(Skin skullData) {
-					sender.sendMessage("§eSkull data generated. §7Finishing block...");
-					sender.sendMessage(" ");
-				}
-			}, new BlockCallback() {
-				@Override
-				public void done(final CustomBlock block) {
-					sender.sendMessage("§aBlock successfully generated. §eUse §7/cbg " + name + " §eto get it!");
-					Bukkit.getScheduler().runTask(CustomBlocks.this, new Runnable() {
-						@Override
-						public void run() {
-							blockManager.saveBlock(block);
-							sender.sendMessage(" ");
-							sender.sendMessage("§7Block saved to file.");
-						}
-					});
-				}
-			});
-		} catch (MalformedURLException e) {
-			sender.sendMessage("§cInvalid URL");
-		}
-	}
+                @Override
+                public void done(Skin skullData) {
+                    sender.sendMessage("§eSkull data generated. §7Finishing block...");
+                    sender.sendMessage(" ");
+                }
+            }, new BlockCallback() {
+                @Override
+                public void done(final CustomBlock block) {
+                    sender.sendMessage("§aBlock successfully generated. §eUse §7/cbg " + name + " §eto get it!");
+                    Bukkit.getScheduler().runTask(CustomBlocks.this, new Runnable() {
+                        @Override
+                        public void run() {
+                            blockManager.saveBlock(block);
+                            sender.sendMessage(" ");
+                            sender.sendMessage("§7Block saved to file.");
+                        }
+                    });
+                }
+            });
+        } catch (MalformedURLException e) {
+            sender.sendMessage("§cInvalid URL");
+        }
+    }
 
-	@Command(name = "givecustomblock",
-			 aliases = {
-					 "getcustomblock",
-					 "customblockgive",
-					 "cbg",
-					 "gcb"
-			 },
-			 usage = "<Name> [Flags (solid, smallBlock, bigBlock, fullBlock, skull)]",
-			 description = "Get a custom block",
-			 min = 1,
-			 max = -1,
-			 fallbackPrefix = "customblocks")
-	@Permission("customblocks.give")
-	public void giveBlock(final Player sender, final String name, @JoinedArg String flagsString) {
-		if (!blockManager.doesBlockExist(name)) {
-			sender.sendMessage("§cBlock doesn't exist");
-			return;
-		}
-		if (flagsString == null) { flagsString = ""; }
-		flagsString = flagsString.toLowerCase();
-		Set<String> flags = new HashSet<>(Arrays.asList(flagsString.split(" ")));
+    @Command(name = "givecustomblock",
+            aliases = {
+                    "getcustomblock",
+                    "customblockgive",
+                    "cbg",
+                    "gcb"
+            },
+            usage = "<Name> [Flags (solid, smallBlock, bigBlock, fullBlock, skull)]",
+            description = "Get a custom block",
+            min = 1,
+            max = -1,
+            fallbackPrefix = "customblocks")
+    @Permission("customblocks.give")
+    public void giveBlock(final Player sender, final String name, @JoinedArg String flagsString) {
+        if (!blockManager.doesBlockExist(name)) {
+            sender.sendMessage("§cBlock doesn't exist");
+            return;
+        }
+        if (flagsString == null) {flagsString = "";}
+        flagsString = flagsString.toLowerCase();
+        Set<String> flags = new HashSet<>(Arrays.asList(flagsString.split(" ")));
 
-		CustomBlock customBlock = blockManager.loadBlock(name);
-		try {
-			ItemStack itemStack = customBlock.baseAsItem(flags);
-			sender.getInventory().addItem(itemStack);
-		} catch (Throwable e) {
-			sender.sendMessage("§cFailed to generate skull item. See console for details.");
-			getLogger().log(Level.SEVERE, "Failed to generate skull item", e);
-		}
-	}
+        CustomBlock customBlock = blockManager.loadBlock(name);
+        try {
+            ItemStack itemStack = customBlock.baseAsItem(flags);
+            sender.getInventory().addItem(itemStack);
+        } catch (Throwable e) {
+            sender.sendMessage("§cFailed to generate skull item. See console for details.");
+            getLogger().log(Level.SEVERE, "Failed to generate skull item", e);
+        }
+    }
 
-	@Completion(name = "givecustomblock")
-	public void giveBlock(List<String> completions, Player sender, final String name, @JoinedArg String flagsString) {
-		if (sender.hasPermission("customblocks.give")) {
-			if (name == null) {
-				for (String s : savesFolder.list()) {
-					if (s.endsWith(".cb")) {
-						completions.add(s.toLowerCase().substring(0, s.length() - 3));
-					}
-				}
-			} else {
-				completions.addAll(Arrays.asList("solid", "smallBlock", "bigBlock", "fullBlock"));
-			}
-		}
-	}
+    @Completion(name = "givecustomblock")
+    public void giveBlock(List<String> completions, Player sender, final String name, @JoinedArg String flagsString) {
+        if (sender.hasPermission("customblocks.give")) {
+            if (name == null) {
+                for (String s : savesFolder.list()) {
+                    if (s.endsWith(".cb")) {
+                        completions.add(s.toLowerCase().substring(0, s.length() - 3));
+                    }
+                }
+            } else {
+                completions.addAll(Arrays.asList("solid", "smallBlock", "bigBlock", "fullBlock"));
+            }
+        }
+    }
 
-	@EventHandler
-	public void on(PlayerInteractEvent e) {
-		if (e.getClickedBlock() != null) {
-			if (e.getAction() != Action.RIGHT_CLICK_BLOCK) { return; }
-			if (e.getClickedBlock().getType() != Material.AIR) {
-				ItemStack hand = e.getPlayer().getItemInHand();
-				if (hand != null && (hand.getType() == Material.PLAYER_HEAD || hand.getType() == Material.PLAYER_WALL_HEAD)) {
-					if (hand.hasItemMeta()) {
-						if (e.getPlayer().hasPermission("customblocks.place")) {
-							String displayName = hand.getItemMeta().getDisplayName();
-							if ("§6CustomBlock".equals(displayName)) {
-								if (hand.getItemMeta().getLore().size() < 2) { return; }
-								String name = hand.getItemMeta().getLore().get(0);
-								if (!blockManager.doesBlockExist(name)) {
-									e.getPlayer().sendMessage("§cBlock file doesn't exist");
-									return;
-								}
-								CustomBlock customBlock = blockManager.loadBlock(name);
-								if (customBlock == null) { return; }
+    @EventHandler
+    public void on(PlayerInteractEvent e) {
+        if (e.getClickedBlock() != null) {
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {return;}
+            if (e.getClickedBlock().getType() != Material.AIR) {
+                ItemStack hand = e.getPlayer().getItemInHand();
+                if (hand != null && (hand.getType() == Material.PLAYER_HEAD || hand.getType() == Material.PLAYER_WALL_HEAD)) {
+                    if (hand.hasItemMeta()) {
+                        if (e.getPlayer().hasPermission("customblocks.place")) {
+                            String displayName = hand.getItemMeta().getDisplayName();
+                            if ("§6CustomBlock".equals(displayName)) {
+                                if (hand.getItemMeta().getLore().size() < 2) {return;}
+                                String name = hand.getItemMeta().getLore().get(0);
+                                if (!blockManager.doesBlockExist(name)) {
+                                    e.getPlayer().sendMessage("§cBlock file doesn't exist");
+                                    return;
+                                }
+                                CustomBlock customBlock = blockManager.loadBlock(name);
+                                if (customBlock == null) {return;}
 
-								List<String> flags = new ArrayList<>(hand.getItemMeta().getLore());
-								flags.remove(0);// This feels so cheaty...
-								flags.remove(0);
+                                List<String> flags = new ArrayList<>(hand.getItemMeta().getLore());
+                                flags.remove(0);// This feels so cheaty...
+                                flags.remove(0);
 
-								if (!flags.contains("skull")) {
-									e.setCancelled(true);
-									int size = flags.contains("fullblock") ? 2 : flags.contains("bigblock") ? 1 : 0;
-									customBlock.spawnOnClicked(e.getClickedBlock(), e.getBlockFace(), flags.contains("solid"), size);
-								}
-								// if it contains "skull", just let the player place the default skull item
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+                                if (!flags.contains("skull")) {
+                                    e.setCancelled(true);
+                                    int size = flags.contains("fullblock") ? 2 : flags.contains("bigblock") ? 1 : 0;
+                                    customBlock.spawnOnClicked(e.getClickedBlock(), e.getBlockFace(), flags.contains("solid"), size);
+                                }
+                                // if it contains "skull", just let the player place the default skull item
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
