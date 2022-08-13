@@ -36,6 +36,8 @@ public class CustomBlocks extends JavaPlugin implements Listener {
 
     @ConfigValue(path = "imgurClientId")
     public String imgurClientId;
+    @ConfigValue(path = "mineskinApiKey")
+    public String mineskinApiKey;
     @ConfigValue(path = "forceVisibility")
     public static boolean forceVisibility;
 
@@ -179,7 +181,9 @@ public class CustomBlocks extends JavaPlugin implements Listener {
             sender.sendMessage("§cBlock doesn't exist");
             return;
         }
-        if (flagsString == null) {flagsString = "";}
+        if (flagsString == null) {
+            flagsString = "";
+        }
         flagsString = flagsString.toLowerCase();
         Set<String> flags = new HashSet<>(Arrays.asList(flagsString.split(" ")));
 
@@ -211,7 +215,9 @@ public class CustomBlocks extends JavaPlugin implements Listener {
     @EventHandler
     public void on(PlayerInteractEvent e) {
         if (e.getClickedBlock() != null) {
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {return;}
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+                return;
+            }
             if (e.getClickedBlock().getType() != Material.AIR) {
                 ItemStack hand = e.getPlayer().getItemInHand();
                 if (hand != null && (hand.getType() == Material.PLAYER_HEAD || hand.getType() == Material.PLAYER_WALL_HEAD)) {
@@ -219,17 +225,21 @@ public class CustomBlocks extends JavaPlugin implements Listener {
                         if (e.getPlayer().hasPermission("customblocks.place")) {
                             String displayName = hand.getItemMeta().getDisplayName();
                             if ("§6CustomBlock".equals(displayName)) {
-                                if (hand.getItemMeta().getLore().size() < 2) {return;}
+                                if (hand.getItemMeta().getLore().size() < 2) {
+                                    return;
+                                }
                                 String name = hand.getItemMeta().getLore().get(0);
                                 if (!blockManager.doesBlockExist(name)) {
                                     e.getPlayer().sendMessage("§cBlock file doesn't exist");
                                     return;
                                 }
                                 CustomBlock customBlock = blockManager.loadBlock(name);
-                                if (customBlock == null) {return;}
+                                if (customBlock == null) {
+                                    return;
+                                }
 
                                 List<String> flags = new ArrayList<>(hand.getItemMeta().getLore());
-                                flags.remove(0);// This feels so cheaty...
+                                flags.remove(0); // This feels so cheaty...
                                 flags.remove(0);
 
                                 if (!flags.contains("skull")) {

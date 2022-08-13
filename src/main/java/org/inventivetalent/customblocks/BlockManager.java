@@ -39,7 +39,10 @@ public class BlockManager {
 
     public BlockManager(CustomBlocks plugin) {
         this.plugin = plugin;
-        skinClient = new MineskinClient();
+        if (plugin.mineskinApiKey != null && plugin.mineskinApiKey.length() < 32) {
+            plugin.mineskinApiKey = null;
+        }
+        skinClient = new MineskinClient("CustomBlocks/" + plugin.getDescription().getVersion(), plugin.mineskinApiKey);
     }
 
     public void createBlock(final String name, final String image, final ImageDownloadCallback imageDownloadCallback, final UploadCallback uploadCallback, final SkinCallback skinCallback, final BlockCallback blockCallback) throws MalformedURLException {
