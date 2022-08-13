@@ -45,69 +45,74 @@ public class PacketListener extends PacketHandler {
     public void onReceive(ReceivedPacket packet) {
         if (packet.hasPlayer()) {
             if (packet.getPacketName().equals("PacketPlayInUseEntity")) {
-                int id = (int) packet.getPacketValue("a");
-                Object useAction = packet.getPacketValue("action");
+                int id = (int) packet.getPacketValue(0);
+                final Object[] useAction = {packet.getPacketValue(1)};
 
-                if (useAction == null) {return;}
+                if (useAction[0] == null) {
+                    return;
+                }
 
-                ArmorStand ent = null;
-                for (ArmorStand e : packet.getPlayer().getWorld().getEntitiesByClass(ArmorStand.class)) {
-                    if (e.getEntityId() == id) {
-                        ent = e;
+                Bukkit.getScheduler().runTask(getPlugin(), () -> {
+                    ArmorStand ent = null;
+                    for (ArmorStand e : packet.getPlayer().getWorld().getEntitiesByClass(ArmorStand.class)) {
+                        if (e.getEntityId() == id) {
+                            ent = e;
+                        }
                     }
-                }
-                if (ent == null) {return;}
-                if (ent.getCustomName() == null || !ent.getCustomName().startsWith("CustomBlock_#")) {return;}
+                    if (ent == null) {
+                        return;
+                    }
+                    if (ent.getCustomName() == null || !ent.getCustomName().startsWith("CustomBlock_#")) {
+                        return;
+                    }
 
-                Player p = packet.getPlayer();
+                    Player p = packet.getPlayer();
 
-                int action = ((Enum) useAction).ordinal();
-
-                final Block block = ent.getLocation().add(0, 1, 0).getBlock();
-
-                if (!p.hasPermission("customblocks.break")) {
-                    packet.setCancelled(true);
-                    return;
-                }
-
-                if (action != 1) {
-                    packet.setCancelled(true);// Interact
-                    return;
-                }
-
-                final Entity ent2 = ent;
-
-                final String baseName = ent.getCustomName();
-                Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final Entity ent1 : p.getNearbyEntities(16, 16, 16)) {
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    if (ent1 == null) {return;}
-                                    if (ent1 instanceof ArmorStand) {
-                                        if (ent1.getCustomName() != null && ent1.getCustomName().equals(baseName)) {
-                                            if (ent1.getLocation().getBlockX() == ent2.getLocation().getBlockX() && ent1.getLocation().getBlockZ() == ent2.getLocation().getBlockZ() && (ent1.getLocation().getBlockY() == ent2.getLocation().getBlockY() || ent1.getLocation().getBlockY() + 1 == ent2.getLocation().getBlockY())) {
-                                                ent1.remove();
-                                            }
-                                        }
-                                    }
-                                }
-                            });
+                    if (!(useAction[0] instanceof Enum)) {
+                        try {
+                            useAction[0] = HeadTextureChanger.EnumEntityUseActionMethodResolver.resolveIndex(0).invoke(useAction[0]);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
                         }
 
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+                    }
+                    int action = ((Enum) useAction[0]).ordinal();
 
-                            @Override
-                            public void run() {
-                                block.breakNaturally(new ItemStack(Material.AIR));
-                                block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 159);
-                                block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 42);
+                    final Block block = ent.getLocation().add(0, 1, 0).getBlock();
+
+                    if (!p.hasPermission("customblocks.break")) {
+                        packet.setCancelled(true);
+                        return;
+                    }
+
+                    if (action != 1) {
+                        packet.setCancelled(true); // Interact
+                        return;
+                    }
+
+                    final Entity ent2 = ent;
+
+                    final String baseName = ent.getCustomName();
+                    for (final Entity ent1 : p.getNearbyEntities(16, 16, 16)) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> {
+                            if (ent1 == null) {
+                                return;
+                            }
+                            if (ent1 instanceof ArmorStand) {
+                                if (ent1.getCustomName() != null && ent1.getCustomName().equals(baseName)) {
+                                    if (ent1.getLocation().getBlockX() == ent2.getLocation().getBlockX() && ent1.getLocation().getBlockZ() == ent2.getLocation().getBlockZ() && (ent1.getLocation().getBlockY() == ent2.getLocation().getBlockY() || ent1.getLocation().getBlockY() + 1 == ent2.getLocation().getBlockY())) {
+                                        ent1.remove();
+                                    }
+                                }
                             }
                         });
                     }
+
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> {
+                        block.breakNaturally(new ItemStack(Material.AIR));
+                        block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 159);
+                        block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, 42);
+                    });
                 });
             }
         }

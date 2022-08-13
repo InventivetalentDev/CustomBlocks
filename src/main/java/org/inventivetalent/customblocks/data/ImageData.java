@@ -2,13 +2,13 @@
 
 package org.inventivetalent.customblocks.data;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import lombok.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.inventivetalent.customblocks.HeadTextureChanger;
-import org.inventivetalent.mcwrapper.auth.GameProfileWrapper;
-import org.inventivetalent.mcwrapper.auth.properties.PropertyWrapper;
 import org.mineskin.data.Texture;
 
 import java.util.*;
@@ -24,10 +24,10 @@ public class ImageData {
     protected String value;
     protected String signature;
 
-    public GameProfileWrapper toProfile() {
-        GameProfileWrapper profileWrapper = new GameProfileWrapper(UUID.randomUUID(), "CustomBlock");
-        profileWrapper.getProperties().put("textures", new PropertyWrapper("textures", value, signature));
-        return profileWrapper;
+    public GameProfile toProfile() {
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "CustomBlock");
+        gameProfile.getProperties().put("textures", new Property("textures", value, signature));
+        return gameProfile;
     }
 
     public ItemStack toItem(String displayName, String blockName) {
@@ -39,12 +39,14 @@ public class ImageData {
         SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
         meta.setDisplayName(displayName);
         List<String> lore = new ArrayList<>(Arrays.asList(blockName, getImage()));
-        if (extraLore != null) {lore.addAll(extraLore);}
+        if (extraLore != null) {
+            lore.addAll(extraLore);
+        }
         meta.setLore(lore);
         try {
-            HeadTextureChanger.applyTextureToMeta(meta, toProfile().getHandle());
+            HeadTextureChanger.applyTextureToMeta(meta, toProfile());
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
         itemStack.setItemMeta(meta);
         return itemStack;

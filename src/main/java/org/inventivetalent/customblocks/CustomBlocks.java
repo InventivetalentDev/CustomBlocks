@@ -144,19 +144,16 @@ public class CustomBlocks extends JavaPlugin implements Listener {
                     sender.sendMessage("§eSkull data generated. §7Finishing block...");
                     sender.sendMessage(" ");
                 }
-            }, new BlockCallback() {
-                @Override
-                public void done(final CustomBlock block) {
-                    sender.sendMessage("§aBlock successfully generated. §eUse §7/cbg " + name + " §eto get it!");
-                    Bukkit.getScheduler().runTask(CustomBlocks.this, new Runnable() {
-                        @Override
-                        public void run() {
-                            blockManager.saveBlock(block);
-                            sender.sendMessage(" ");
-                            sender.sendMessage("§7Block saved to file.");
-                        }
-                    });
-                }
+            }, block -> {
+                sender.sendMessage("§aBlock successfully generated. §eUse §7/cbg " + name + " §eto get it!");
+                Bukkit.getScheduler().runTask(CustomBlocks.this, new Runnable() {
+                    @Override
+                    public void run() {
+                        blockManager.saveBlock(block);
+                        sender.sendMessage(" ");
+                        sender.sendMessage("§7Block saved to file.");
+                    }
+                });
             });
         } catch (MalformedURLException e) {
             sender.sendMessage("§cInvalid URL");

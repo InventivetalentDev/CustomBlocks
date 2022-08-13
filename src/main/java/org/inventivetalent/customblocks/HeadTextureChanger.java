@@ -20,12 +20,13 @@ public class HeadTextureChanger {
     static final NMSClassResolver nmsClassResolver = new NMSClassResolver();
     static final OBCClassResolver obcClassResolver = new OBCClassResolver();
 
-    static Class<?> World = nmsClassResolver.resolveSilent("World");
-    static Class<?> WorldServer = nmsClassResolver.resolveSilent("WorldServer");
-    static Class<?> TileEntitySkull = nmsClassResolver.resolveSilent("TileEntitySkull");
-    static Class<?> NBTTagCompound = nmsClassResolver.resolveSilent("NBTTagCompound");
-    static Class<?> NBTBase = nmsClassResolver.resolveSilent("NBTBase");
-    static Class<?> GameProfileSerializer = nmsClassResolver.resolveSilent("GameProfileSerializer");
+    static Class<?> World = nmsClassResolver.resolveSilent("world.level.World", "World");
+    static Class<?> WorldServer = nmsClassResolver.resolveSilent("server.level.WorldServer", "WorldServer");
+    static Class<?> TileEntitySkull = nmsClassResolver.resolveSilent("world.level.block.entity.TileEntitySkull", "TileEntitySkull");
+    static Class<?> NBTTagCompound = nmsClassResolver.resolveSilent("nbt.NBTTagCompound", "NBTTagCompound");
+    static Class<?> NBTBase = nmsClassResolver.resolveSilent("nbt.NBTBase", "NBTBase");
+    static Class<?> GameProfileSerializer = nmsClassResolver.resolveSilent("nbt.GameProfileSerializer", "GameProfileSerializer");
+    static Class<?> EnumEntityUseAction = nmsClassResolver.resolveSilent("network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction");
     static Class<?> CraftMetaSkull = obcClassResolver.resolveSilent("inventory.CraftMetaSkull");
 
     static Class<?> GameProfile = classResolver.resolveSilent("net.minecraft.util.com.mojang.authlib.GameProfile", "com.mojang.authlib.GameProfile");
@@ -35,6 +36,7 @@ public class HeadTextureChanger {
     static final MethodResolver TileEntitySkullMethodResolver = new MethodResolver(TileEntitySkull);
     static final MethodResolver NBTTagCompoundMethodResolver = new MethodResolver(NBTTagCompound);
     static final MethodResolver GameProfileSerializerMethodResolver = new MethodResolver(GameProfileSerializer);
+    static final MethodResolver EnumEntityUseActionMethodResolver = new MethodResolver(EnumEntityUseAction);
 
     static final FieldResolver TileEntitySkullFieldResolver = new FieldResolver(TileEntitySkull);
     static final FieldResolver CraftMetaSkullFieldResolver = new FieldResolver(CraftMetaSkull);
@@ -65,7 +67,9 @@ public class HeadTextureChanger {
     }
 
     public static Object createProfile(String value, String signature) {
-        if (signature == null) {return createProfile(value);}
+        if (signature == null) {
+            return createProfile(value);
+        }
         try {
             GameProfileWrapper profileWrapper = new GameProfileWrapper(UUID.randomUUID(), "CustomBlock");
             PropertyWrapper propertyWrapper = new PropertyWrapper("textures", value, signature);
@@ -90,13 +94,17 @@ public class HeadTextureChanger {
     }
 
     public static SkullMeta applyTextureToMeta(SkullMeta meta, Object profile) throws Exception {
-        if (meta == null) {throw new IllegalArgumentException("meta cannot be null");}
-        if (profile == null) {throw new IllegalArgumentException("profile cannot be null");}
+        if (meta == null) {
+            throw new IllegalArgumentException("meta cannot be null");
+        }
+        if (profile == null) {
+            throw new IllegalArgumentException("profile cannot be null");
+        }
         Object baseNBTTag = NBTTagCompound.newInstance();
         Object ownerNBTTag = NBTTagCompound.newInstance();
 
-        GameProfileSerializerMethodResolver.resolve(new ResolverQuery("serialize", NBTTagCompound, GameProfile)).invoke(null, ownerNBTTag, profile);
-        NBTTagCompoundMethodResolver.resolve(new ResolverQuery("set", String.class, NBTBase)).invoke(baseNBTTag, "SkullOwner", ownerNBTTag);
+        GameProfileSerializerMethodResolver.resolve(new ResolverQuery("serialize", NBTTagCompound, GameProfile), new ResolverQuery("a", NBTTagCompound, GameProfile)).invoke(null, ownerNBTTag, profile);
+        NBTTagCompoundMethodResolver.resolve(new ResolverQuery("set", String.class, NBTBase), new ResolverQuery("a", String.class, NBTBase)).invoke(baseNBTTag, "SkullOwner", ownerNBTTag);
 
         SkullMeta newMeta = (SkullMeta) CraftMetaSkullConstructorResolver.resolve(new Class[]{NBTTagCompound}).newInstance(baseNBTTag);
 
