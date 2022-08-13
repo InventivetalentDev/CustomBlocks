@@ -30,7 +30,9 @@ public class CustomBlock {
 
     public CoordinateImageData getCoordinateData(int x, int y, int z) {
         for (CoordinateImageData data : images) {
-            if (data.getX() == x && data.getY() == y && data.getZ() == z) {return data;}
+            if (data.getX() == x && data.getY() == y && data.getZ() == z) {
+                return data;
+            }
         }
         return null;
     }
@@ -69,7 +71,7 @@ public class CustomBlock {
         double addY;
         double addZ;
 
-        if (size == 2) {// fullBlock <-- Psst, try this with md_5's skin, it looks like a pufferfish :P
+        if (size == 2) { // fullBlock <-- Psst, try this with md_5's skin, it looks like a pufferfish :P
             double add = 0.2;
             multiplier = .25 + add;
 
@@ -78,14 +80,14 @@ public class CustomBlock {
             addX = -0.078125 * 2;
             addY = -0.875;
             addZ = -0.078125 * 2;
-        } else if (size == 1) {// bigBlock
+        } else if (size == 1) { // bigBlock
             multiplier = .5935;
             yMultiplier = .5935;
 
             addX = -0.813 / 2;
             addY = -1.03;
             addZ = -0.813 / 2;
-        } else {// smallBlock
+        } else { // smallBlock
             multiplier = .415;
             yMultiplier = .415;
 

@@ -22,7 +22,9 @@ public class PacketListener extends PacketHandler {
 
     public PacketListener(Plugin pl) {
         super(pl);
-        if (instance != null) {throw new IllegalStateException("Cannot instantiate PacketListener twice");}
+        if (instance != null) {
+            throw new IllegalStateException("Cannot instantiate PacketListener twice");
+        }
         instance = this;
         addHandler(instance);
     }
